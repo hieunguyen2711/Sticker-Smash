@@ -8,6 +8,7 @@ import ImageViewer from "@/components/ImageViewer";
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from "react";
 import { ImageSourcePropType, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 
 
@@ -56,7 +57,8 @@ export default function Index() {
   }
 
   return (
-    <View style={styles.container}>
+    <GestureHandlerRootView style={styles.container}>
+      <View style={styles.container}>
       <View style={styles.imageContainer}>
         <ImageViewer imgSource={PlaceholderImage} selectedImage={selectedImg}/>
         {pickedEmoji && <EmojiSticker imageSize={40} stickerSource={pickedEmoji}/>}
@@ -81,6 +83,8 @@ export default function Index() {
       
 
     </View>
+    </GestureHandlerRootView>
+    
   );
 }
 
