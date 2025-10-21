@@ -3,6 +3,7 @@ import { ImageSourcePropType, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
+
 type Props = {
     imageSize: number;
     stickerSource: ImageSourcePropType;
@@ -12,9 +13,13 @@ export default function EmojiSticker({imageSize, stickerSource}: Props) {
     // the reference to scaleImage will take the value of imageSize as its initial value. 
     // It helps to mutate data and runs animation based on the current value. 
     // We can also access and modify the shared value using the .value property
-    
-    
     const scaleImage = useSharedValue(imageSize);
+
+    // The translateion values defined will move the sticker around the screen. 
+    // Since the sticker moves along both axes , we need to track the X and Y values
+    // Set the value inside the useSharedValue hook to be 0, representing initial position and a starting point. 
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
 
     // We will create a doubleTap Object to scale the initial value and use Gesture.tap() to animate the transition while scaling the sticker image.
     // To determine the number of taps required, we'll add numberOfTaps()
@@ -38,8 +43,31 @@ export default function EmojiSticker({imageSize, stickerSource}: Props) {
         };
         
     });
+
+    const containerStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          translateX: translateX.value,
+        },
+        {
+          translateY: translateY.value,
+        },
+      ],
+    };
+  });
+
+    const drag = Gesture.Pan().onChange(event => {
+    translateX.value += event.changeX;
+    translateY.value += event.changeY;
+  });
+
+  
     return (
-        <View style={{ position: "relative", width: imageSize, height: imageSize }}>
+        <GestureDetector gesture={drag}>
+
+            <Animated.View style={[containerStyle, {top: -350}]}>
+            <View style={{ position: "relative", width: imageSize, height: imageSize }}>
             {/* the gesture prop takes the value of the doubleTap to trigger a gesture when a user double-taps the sticker image */}
             <GestureDetector gesture={doubleTap}>
 
@@ -51,5 +79,10 @@ export default function EmojiSticker({imageSize, stickerSource}: Props) {
 
             </GestureDetector>
         </View>
+        </Animated.View>
+
+        </GestureDetector>
+        
+        
     )
 }
